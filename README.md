@@ -8,14 +8,7 @@
 3) `python main.py`
 
 ## Build EXE (Windows)
-PowerShell
-pyinstaller --noconfirm --onefile --windowed `
-    --name "YDL Studio" `
-    --add-data "user_guide.txt;." `
-    --log-level ERROR `
-    main.py
 
-CMD
 pyinstaller --noconfirm --onefile --windowed ^
   --name "YDL Studio" ^
   --add-data "user_guide.txt;." ^
