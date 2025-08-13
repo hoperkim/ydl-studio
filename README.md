@@ -24,7 +24,7 @@ A Windows GUI for yt-dlp that lets you download videos by copying and pasting UR
 ---
 
 ## 🛠 사용 방법
-1. **압축 해제** 후 `YDL Studio.exe` 실행  
+1. `YDL Studio.exe` 실행  
    (Python 미설치 PC에서도 바로 사용 가능)
 2. 필요 시 FFmpeg 다운로드 확인창이 뜨면 **Yes** 선택
 3. 동영상 / 재생목록 / 채널 URL을 붙여넣기
