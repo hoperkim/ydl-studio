@@ -1,5 +1,7 @@
 # ⚡ YDL Studio (v1.0.0 Modern)
 
+[![Release](https://img.shields.io/github/v/release/hoperkim/ydl-studio?color=green)](https://github.com/hoperkim/ydl-studio/releases/latest)
+[![Download](https://img.shields.io/badge/Download-YDL--Studio.exe-brightgreen?logo=windows&logoColor=white)](https://github.com/hoperkim/ydl-studio/releases/download/v1.0.0/YDL-Studio.exe)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![yt-dlp](https://img.shields.io/badge/Engine-yt--dlp-FF0000?logo=youtube&logoColor=white)](https://github.com/yt-dlp/yt-dlp)
 [![UI](https://img.shields.io/badge/GUI-CustomTkinter-blue)](https://github.com/TomSchimansky/CustomTkinter)
