@@ -2,16 +2,16 @@
 Modern Theme & Styling Constants for YDL Studio.
 """
 
-FONT_FAMILY = "Segoe UI"
+FONT_FAMILY = "Malgun Gothic"
 
 FONTS = {
-    "title": (FONT_FAMILY, 18, "bold"),
-    "subtitle": (FONT_FAMILY, 14, "bold"),
-    "header": (FONT_FAMILY, 13, "bold"),
-    "body": (FONT_FAMILY, 12),
-    "body_bold": (FONT_FAMILY, 12, "bold"),
-    "caption": (FONT_FAMILY, 11),
-    "badge": (FONT_FAMILY, 10, "bold"),
+    "title": (FONT_FAMILY, 22, "bold"),
+    "subtitle": (FONT_FAMILY, 15, "bold"),
+    "header": (FONT_FAMILY, 15, "bold"),
+    "body": (FONT_FAMILY, 14),
+    "body_bold": (FONT_FAMILY, 14, "bold"),
+    "caption": (FONT_FAMILY, 13),
+    "badge": (FONT_FAMILY, 12, "bold"),
 }
 
 COLORS = {

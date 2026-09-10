@@ -64,7 +64,7 @@ class MainWindow(ctk.CTk):
         subtitle_label = ctk.CTkLabel(
             header_frame,
             text="고화질 영상 & 오디오 다운로더 • yt-dlp 기반",
-            font=FONTS["caption"],
+            font=FONTS["body"],
             text_color=COLORS["text_muted"],
             anchor="w"
         )
@@ -93,14 +93,14 @@ class MainWindow(ctk.CTk):
         self.empty_label = ctk.CTkLabel(
             self.queue_frame,
             text="📥 다운로드 대기열이 비어 있습니다.\n\n상단에 유튜브 주소를 입력하거나 붙여넣어 주세요.",
-            font=FONTS["body"],
+            font=FONTS["subtitle"],
             text_color=COLORS["text_muted"],
             justify="center"
         )
         self.empty_label.pack(pady=100)
 
         # 4. Status Bar
-        status_bar = ctk.CTkFrame(self, height=32, fg_color=COLORS["card_bg"], corner_radius=0)
+        status_bar = ctk.CTkFrame(self, height=36, fg_color=COLORS["card_bg"], corner_radius=0)
         status_bar.grid(row=3, column=0, sticky="ew")
         status_bar.grid_columnconfigure(1, weight=1)
 

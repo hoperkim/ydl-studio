@@ -71,7 +71,7 @@ class DownloadCard(ctk.CTkFrame):
         self.title_label = ctk.CTkLabel(
             header_frame,
             text=title_text,
-            font=FONTS["body_bold"],
+            font=FONTS["header"],
             anchor="w",
             justify="left"
         )
@@ -81,9 +81,9 @@ class DownloadCard(ctk.CTkFrame):
         self.btn_close = ctk.CTkButton(
             header_frame,
             text="✕",
-            width=24,
-            height=24,
-            font=FONTS["caption"],
+            width=28,
+            height=28,
+            font=FONTS["body_bold"],
             fg_color="transparent",
             hover_color=("gray80", "gray30"),
             text_color=("gray40", "gray70"),
@@ -116,10 +116,10 @@ class DownloadCard(ctk.CTkFrame):
             ctrl_frame,
             values=presets,
             variable=self.preset_var,
-            width=180,
-            height=30,
-            font=FONTS["caption"],
-            dropdown_font=FONTS["caption"]
+            width=200,
+            height=34,
+            font=FONTS["body"],
+            dropdown_font=FONTS["body"]
         )
         self.opt_preset.grid(row=0, column=0, sticky="w", padx=(0, 8))
 
@@ -127,8 +127,8 @@ class DownloadCard(ctk.CTkFrame):
         self.btn_action = ctk.CTkButton(
             ctrl_frame,
             text="⬇️ 다운로드",
-            width=100,
-            height=30,
+            width=110,
+            height=34,
             font=FONTS["body_bold"],
             fg_color=COLORS["accent_primary"],
             hover_color=COLORS["accent_hover"],
@@ -140,9 +140,9 @@ class DownloadCard(ctk.CTkFrame):
         self.btn_folder = ctk.CTkButton(
             ctrl_frame,
             text="📂 폴더 열기",
-            width=90,
-            height=30,
-            font=FONTS["caption"],
+            width=100,
+            height=34,
+            font=FONTS["body_bold"],
             fg_color=("gray80", "gray25"),
             hover_color=("gray70", "gray35"),
             text_color=("black", "white"),

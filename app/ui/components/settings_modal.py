@@ -23,7 +23,7 @@ class SettingsModal(ctk.CTkToplevel):
     ):
         super().__init__(master, **kwargs)
         self.title("YDL Studio 환경 설정")
-        self.geometry("520x450")
+        self.geometry("560x490")
         self.resizable(False, False)
         self.transient(master)
         self.grab_set()
@@ -51,8 +51,8 @@ class SettingsModal(ctk.CTkToplevel):
 
         self.path_entry = ctk.CTkEntry(
             path_frame,
-            height=32,
-            font=FONTS["caption"]
+            height=36,
+            font=FONTS["body"]
         )
         self.path_entry.insert(0, self.save_dir)
         self.path_entry.grid(row=1, column=0, sticky="ew", padx=(15, 8), pady=(0, 12))
@@ -60,9 +60,9 @@ class SettingsModal(ctk.CTkToplevel):
         ctk.CTkButton(
             path_frame,
             text="찾아보기",
-            width=80,
-            height=32,
-            font=FONTS["caption"],
+            width=90,
+            height=36,
+            font=FONTS["body"],
             command=self._browse_path
         ).grid(row=1, column=1, padx=(0, 15), pady=(0, 12))
 
@@ -94,9 +94,10 @@ class SettingsModal(ctk.CTkToplevel):
             cookie_frame,
             values=browser_opts,
             variable=self.browser_var,
-            width=200,
-            height=32,
+            width=220,
+            height=36,
             font=FONTS["body"],
+            dropdown_font=FONTS["body"],
         )
         self.opt_browser.grid(row=2, column=0, sticky="w", padx=15, pady=(0, 12))
 
@@ -125,8 +126,8 @@ class SettingsModal(ctk.CTkToplevel):
         self.btn_update_engine = ctk.CTkButton(
             engine_frame,
             text="엔진 최신 버전으로 업데이트",
-            height=30,
-            font=FONTS["caption"],
+            height=34,
+            font=FONTS["body"],
             fg_color=("gray75", "gray30"),
             hover_color=("gray65", "gray40"),
             text_color=("black", "white"),
@@ -142,8 +143,8 @@ class SettingsModal(ctk.CTkToplevel):
         ctk.CTkButton(
             btn_box,
             text="확인 및 저장",
-            width=120,
-            height=36,
+            width=130,
+            height=40,
             font=FONTS["body_bold"],
             fg_color=COLORS["accent_primary"],
             hover_color=COLORS["accent_hover"],

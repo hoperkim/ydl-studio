@@ -34,7 +34,7 @@ class UrlInputBar(ctk.CTkFrame):
         self.entry = ctk.CTkEntry(
             row_frame,
             placeholder_text="다운로드할 유튜브 또는 영상 URL을 입력하세요 (예: https://www.youtube.com/watch?v=...)",
-            height=40,
+            height=44,
             font=FONTS["body"],
             border_width=0,
             fg_color="transparent",
@@ -46,9 +46,9 @@ class UrlInputBar(ctk.CTkFrame):
         self.btn_paste = ctk.CTkButton(
             row_frame,
             text="📋 붙여넣기",
-            width=90,
-            height=34,
-            font=FONTS["caption"],
+            width=100,
+            height=38,
+            font=FONTS["body"],
             fg_color=("gray85", "gray25"),
             hover_color=("gray75", "gray35"),
             text_color=("black", "white"),
@@ -60,8 +60,8 @@ class UrlInputBar(ctk.CTkFrame):
         self.btn_analyze = ctk.CTkButton(
             row_frame,
             text="⚡ 영상 추가",
-            width=100,
-            height=34,
+            width=110,
+            height=38,
             font=FONTS["body_bold"],
             fg_color=COLORS["accent_primary"],
             hover_color=COLORS["accent_hover"],
@@ -80,9 +80,9 @@ class UrlInputBar(ctk.CTkFrame):
             opt_frame,
             text="클립보드 링크 복사 시 자동 감지",
             variable=self.auto_clip_var,
-            font=FONTS["caption"],
-            checkbox_width=18,
-            checkbox_height=18,
+            font=FONTS["body"],
+            checkbox_width=20,
+            checkbox_height=20,
             command=self._on_toggle_clip
         )
         self.chk_auto_clip.grid(row=0, column=0, sticky="w", padx=10)
@@ -91,8 +91,8 @@ class UrlInputBar(ctk.CTkFrame):
         self.btn_settings = ctk.CTkButton(
             opt_frame,
             text="⚙️ 환경 설정",
-            width=90,
-            height=26,
+            width=105,
+            height=32,
             font=FONTS["caption"],
             fg_color="transparent",
             border_width=1,
