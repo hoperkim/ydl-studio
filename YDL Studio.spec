@@ -1,12 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 
+from PyInstaller.utils.hooks import collect_data_files
+
+datas = [('user_guide.txt', '.')]
+datas += collect_data_files('customtkinter')
+
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('user_guide.txt', '.')],
-    hiddenimports=[],
+    datas=datas,
+    hiddenimports=['PIL._tkinter_finder', 'customtkinter', 'yt_dlp'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
