@@ -34,60 +34,71 @@ def extract_video_info(url: str, browser_cookie: Optional[str] = None) -> Dict[s
     if browser_cookie:
         ydl_opts['cookiesfrombrowser'] = (browser_cookie,)
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        if not info:
-            raise ValueError("영상 정보를 가져올 수 없습니다.")
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+    except Exception as e:
+        err_str = str(e).lower()
+        if browser_cookie and ("cookie" in err_str or "permission" in err_str):
+            # Fallback: Retry without browser cookies if locked by browser process
+            ydl_opts.pop('cookiesfrombrowser', None)
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+        else:
+            raise e
 
-        # Check if it's a playlist
-        is_playlist = 'entries' in info and info['entries'] is not None
-        if is_playlist:
-            entries = list(info['entries'])
-            first_entry = entries[0] if entries else {}
-            title = info.get('title') or "재생목록"
-            uploader = info.get('uploader') or first_entry.get('uploader') or "알 수 없음"
-            thumbnail = info.get('thumbnail') or first_entry.get('thumbnail') or ""
-            count = len(entries)
-            return {
-                'url': url,
-                'is_playlist': True,
-                'playlist_count': count,
-                'title': f"[재생목록] {title} ({count}개 영상)",
-                'channel': uploader,
-                'duration_str': f"{count}개 항목",
-                'thumbnail_url': thumbnail,
-                'available_presets': get_available_presets([]),
-            }
+    if not info:
+        raise ValueError("영상 정보를 가져올 수 없습니다.")
 
-        title = info.get('title', '제목 없음')
-        uploader = info.get('uploader') or info.get('channel') or '알 수 없는 채널'
-        duration = info.get('duration')
-        thumbnail = info.get('thumbnail') or ""
-        formats = info.get('formats') or []
-
-        # Find max available resolution
-        heights = set()
-        for f in formats:
-            h = f.get('height')
-            if h and isinstance(h, int):
-                heights.add(h)
-
-        presets = get_available_presets(sorted(list(heights), reverse=True))
-
+    # Check if it's a playlist
+    is_playlist = 'entries' in info and info['entries'] is not None
+    if is_playlist:
+        entries = list(info['entries'])
+        first_entry = entries[0] if entries else {}
+        title = info.get('title') or "재생목록"
+        uploader = info.get('uploader') or first_entry.get('uploader') or "알 수 없음"
+        thumbnail = info.get('thumbnail') or first_entry.get('thumbnail') or ""
+        count = len(entries)
         return {
             'url': url,
-            'is_playlist': False,
-            'title': title,
+            'is_playlist': True,
+            'playlist_count': count,
+            'title': f"[재생목록] {title} ({count}개 영상)",
             'channel': uploader,
-            'duration': duration,
-            'duration_str': format_duration(duration),
+            'duration_str': f"{count}개 항목",
             'thumbnail_url': thumbnail,
-            'available_presets': presets,
-            'raw_info': {
-                'id': info.get('id'),
-                'view_count': info.get('view_count'),
-            }
+            'available_presets': get_available_presets([]),
         }
+
+    title = info.get('title', '제목 없음')
+    uploader = info.get('uploader') or info.get('channel') or '알 수 없는 채널'
+    duration = info.get('duration')
+    thumbnail = info.get('thumbnail') or ""
+    formats = info.get('formats') or []
+
+    # Find max available resolution
+    heights = set()
+    for f in formats:
+        h = f.get('height')
+        if h and isinstance(h, int):
+            heights.add(h)
+
+    presets = get_available_presets(sorted(list(heights), reverse=True))
+
+    return {
+        'url': url,
+        'is_playlist': False,
+        'title': title,
+        'channel': uploader,
+        'duration': duration,
+        'duration_str': format_duration(duration),
+        'thumbnail_url': thumbnail,
+        'available_presets': presets,
+        'raw_info': {
+            'id': info.get('id'),
+            'view_count': info.get('view_count'),
+        }
+    }
 
 
 def get_available_presets(heights: List[int]) -> List[str]:

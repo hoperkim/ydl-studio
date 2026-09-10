@@ -159,13 +159,34 @@ class DownloadTask:
             if self.on_status_change:
                 self.on_status_change("DOWNLOADING", "다운로드 준비 중…")
             opts = self._build_ydl_opts()
-            with yt_dlp.YoutubeDL(opts) as ydl:
-                info = ydl.extract_info(self.url, download=True)
-                if not self.output_filepath and info:
-                    requested_downloads = info.get('requested_downloads')
-                    if requested_downloads and len(requested_downloads) > 0:
-                        self.output_filepath = requested_downloads[0].get('filepath')
+
+            info = None
+            try:
+                with yt_dlp.YoutubeDL(opts) as ydl:
+                    info = ydl.extract_info(self.url, download=True)
+            except Exception as e:
+                err_str = str(e).lower()
+                if self.browser_cookie and ("cookie" in err_str or "permission" in err_str):
+                    # Fallback retry without browser cookies
+                    opts.pop('cookiesfrombrowser', None)
+                    with yt_dlp.YoutubeDL(opts) as ydl:
+                        info = ydl.extract_info(self.url, download=True)
+                else:
+                    raise e
+
+            if info:
+                # Resolve final output filepath
+                requested_downloads = info.get('requested_downloads')
+                if requested_downloads and len(requested_downloads) > 0:
+                    for req in requested_downloads:
+                        fp = req.get('filepath')
+                        if fp and not fp.endswith('.part') and 'fhls-audio' not in fp:
+                            self.output_filepath = fp
+                            break
                     if not self.output_filepath:
+                        self.output_filepath = requested_downloads[0].get('filepath')
+                if not self.output_filepath:
+                    with yt_dlp.YoutubeDL(opts) as ydl:
                         self.output_filepath = ydl.prepare_filename(info)
 
             if not self.is_cancelled:
