@@ -35,6 +35,9 @@ class MainWindow(ctk.CTk):
         self.geometry("900x700")
         self.minsize(800, 550)
 
+        # Set Window Icon
+        self._set_window_icon()
+
         # State variables
         self.cards: List[DownloadCard] = []
         self.last_clipboard_text = ""
@@ -43,6 +46,27 @@ class MainWindow(ctk.CTk):
         self._build_layout()
         self._start_clipboard_monitor()
 
+    def _set_window_icon(self):
+        """Set window icon from assets folder."""
+        import sys
+        if getattr(sys, 'frozen', False):
+            base_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+            paths = [
+                os.path.join(base_dir, "app", "assets", "icon.ico"),
+                os.path.join(base_dir, "assets", "icon.ico"),
+            ]
+        else:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            paths = [os.path.join(base_dir, "assets", "icon.ico")]
+
+        for p in paths:
+            if os.path.exists(p):
+                try:
+                    self.iconbitmap(p)
+                    break
+                except Exception:
+                    pass
+
     def _build_layout(self):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(2, weight=1)  # Queue scroll area expands
@@ -50,16 +74,40 @@ class MainWindow(ctk.CTk):
         # 1. Header (Brand Logo & Title)
         header_frame = ctk.CTkFrame(self, fg_color="transparent")
         header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=(15, 8))
-        header_frame.grid_columnconfigure(0, weight=1)
+        header_frame.grid_columnconfigure(1, weight=1)
+
+        # App Logo Icon
+        import sys
+        if getattr(sys, 'frozen', False):
+            base_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+            png_paths = [
+                os.path.join(base_dir, "app", "assets", "icon.png"),
+                os.path.join(base_dir, "assets", "icon.png")
+            ]
+        else:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            png_paths = [os.path.join(base_dir, "assets", "icon.png")]
+
+        for p in png_paths:
+            if os.path.exists(p):
+                try:
+                    from PIL import Image
+                    pil_logo = Image.open(p)
+                    logo_img = ctk.CTkImage(light_image=pil_logo, dark_image=pil_logo, size=(40, 40))
+                    logo_lbl = ctk.CTkLabel(header_frame, image=logo_img, text="")
+                    logo_lbl.grid(row=0, column=0, rowspan=2, padx=(0, 12), sticky="w")
+                    break
+                except Exception:
+                    pass
 
         title_label = ctk.CTkLabel(
             header_frame,
-            text="⚡ YDL Studio",
+            text="YDL Studio",
             font=FONTS["title"],
             text_color=COLORS["accent_primary"],
             anchor="w"
         )
-        title_label.grid(row=0, column=0, sticky="w")
+        title_label.grid(row=0, column=1, sticky="w")
 
         subtitle_label = ctk.CTkLabel(
             header_frame,
@@ -68,7 +116,7 @@ class MainWindow(ctk.CTk):
             text_color=COLORS["text_muted"],
             anchor="w"
         )
-        subtitle_label.grid(row=1, column=0, sticky="w")
+        subtitle_label.grid(row=1, column=1, sticky="w")
 
         # 2. URL Input Bar
         self.input_bar = UrlInputBar(

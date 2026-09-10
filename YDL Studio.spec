@@ -3,7 +3,7 @@
 
 from PyInstaller.utils.hooks import collect_data_files
 
-datas = [('user_guide.txt', '.')]
+datas = [('user_guide.txt', '.'), ('app/assets', 'app/assets')]
 datas += collect_data_files('customtkinter')
 
 a = Analysis(
@@ -28,6 +28,7 @@ exe = EXE(
     a.datas,
     [],
     name='YDL Studio',
+    icon='app/assets/icon.ico',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
