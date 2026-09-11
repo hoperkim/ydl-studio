@@ -2,3 +2,4 @@ customtkinter>=6.0.0
 yt-dlp>=2026.08.19
 pillow>=12.3.0
 requests>=2.34.0
+curl_cffi>=0.16.0

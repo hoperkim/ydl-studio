@@ -6,6 +6,7 @@ import urllib.request
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image
 import yt_dlp
+from app.utils.clipboard import clean_media_url
 
 
 def format_duration(seconds: Optional[int]) -> str:
@@ -24,6 +25,7 @@ def extract_video_info(url: str, browser_cookie: Optional[str] = None) -> Dict[s
     Extract metadata for a video or playlist without downloading media files.
     Returns a dictionary containing title, channel, duration, thumbnail_url, formats, etc.
     """
+    url = clean_media_url(url)
     ydl_opts: Dict[str, Any] = {
         'skip_download': True,
         'quiet': True,

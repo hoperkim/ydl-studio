@@ -6,6 +6,7 @@ import os
 import threading
 from typing import Any, Callable, Dict, Optional
 import yt_dlp
+from app.utils.clipboard import clean_media_url
 
 
 class DownloadTask:
@@ -26,7 +27,7 @@ class DownloadTask:
         on_finish: Optional[Callable[[str], None]] = None,
         on_error: Optional[Callable[[str], None]] = None,
     ) -> None:
-        self.url = url
+        self.url = clean_media_url(url)
         self.save_dir = save_dir
         self.preset = preset
         self.browser_cookie = browser_cookie
