@@ -1,5 +1,5 @@
 """
-URL Input Bar Component with Paste and Quick-Action Buttons.
+URL Input Bar Component with Paste, Quick-Action, and Browser Sniffer Buttons.
 """
 from typing import Callable, Optional
 import customtkinter as ctk
@@ -7,7 +7,7 @@ from app.ui.theme import FONTS, COLORS
 
 
 class UrlInputBar(ctk.CTkFrame):
-    """Top bar for URL entry, analysis, clipboard toggle, and settings button."""
+    """Top bar for URL entry, analysis, clipboard toggle, settings, and browser sniffer."""
 
     def __init__(
         self,
@@ -15,12 +15,14 @@ class UrlInputBar(ctk.CTkFrame):
         on_analyze: Callable[[str], None],
         on_open_settings: Callable[[], None],
         on_clipboard_toggle: Callable[[bool], None],
+        on_open_sniffer: Optional[Callable[[], None]] = None,
         **kwargs
     ):
         super().__init__(master, fg_color="transparent", **kwargs)
         self.on_analyze = on_analyze
         self.on_open_settings = on_open_settings
         self.on_clipboard_toggle = on_clipboard_toggle
+        self.on_open_sniffer = on_open_sniffer
 
         # Grid configuration
         self.grid_columnconfigure(0, weight=1)
@@ -33,7 +35,7 @@ class UrlInputBar(ctk.CTkFrame):
         # Entry
         self.entry = ctk.CTkEntry(
             row_frame,
-            placeholder_text="다운로드할 유튜브 또는 영상 URL을 입력하세요 (예: https://www.youtube.com/watch?v=...)",
+            placeholder_text="유튜브, 인스타, 틱톡, 웹사이트 주소 또는 m3u8/mpd 링크를 입력하세요…",
             height=44,
             font=FONTS["body"],
             border_width=0,
@@ -46,7 +48,7 @@ class UrlInputBar(ctk.CTkFrame):
         self.btn_paste = ctk.CTkButton(
             row_frame,
             text="📋 붙여넣기",
-            width=100,
+            width=95,
             height=38,
             font=FONTS["body"],
             fg_color=("gray85", "gray25"),
@@ -60,7 +62,7 @@ class UrlInputBar(ctk.CTkFrame):
         self.btn_analyze = ctk.CTkButton(
             row_frame,
             text="⚡ 영상 추가",
-            width=110,
+            width=105,
             height=38,
             font=FONTS["body_bold"],
             fg_color=COLORS["accent_primary"],
@@ -69,7 +71,7 @@ class UrlInputBar(ctk.CTkFrame):
         )
         self.btn_analyze.grid(row=0, column=2, padx=(0, 10), pady=8)
 
-        # Sub-row for options & settings
+        # Sub-row for options, sniffer & settings
         opt_frame = ctk.CTkFrame(self, fg_color="transparent")
         opt_frame.grid(row=1, column=0, sticky="ew", padx=5, pady=(0, 5))
         opt_frame.grid_columnconfigure(1, weight=1)
@@ -78,21 +80,38 @@ class UrlInputBar(ctk.CTkFrame):
         self.auto_clip_var = ctk.BooleanVar(value=True)
         self.chk_auto_clip = ctk.CTkCheckBox(
             opt_frame,
-            text="클립보드 링크 복사 시 자동 감지",
+            text="클립보드 링크 자동 감지",
             variable=self.auto_clip_var,
-            font=FONTS["body"],
-            checkbox_width=20,
-            checkbox_height=20,
+            font=FONTS["caption"],
+            checkbox_width=18,
+            checkbox_height=18,
             command=self._on_toggle_clip
         )
         self.chk_auto_clip.grid(row=0, column=0, sticky="w", padx=10)
 
+        # Right buttons container
+        right_btns = ctk.CTkFrame(opt_frame, fg_color="transparent")
+        right_btns.grid(row=0, column=2, sticky="e", padx=5)
+
+        # Browser Sniffer button
+        self.btn_sniffer = ctk.CTkButton(
+            right_btns,
+            text="🌐 브라우저 감지기 (만능 스니퍼)",
+            width=190,
+            height=30,
+            font=FONTS["caption_bold"],
+            fg_color="#10b981",
+            hover_color="#059669",
+            command=self._on_click_sniffer
+        )
+        self.btn_sniffer.pack(side="left", padx=(0, 8))
+
         # Settings button
         self.btn_settings = ctk.CTkButton(
-            opt_frame,
+            right_btns,
             text="⚙️ 환경 설정",
-            width=105,
-            height=32,
+            width=90,
+            height=30,
             font=FONTS["caption"],
             fg_color="transparent",
             border_width=1,
@@ -100,7 +119,7 @@ class UrlInputBar(ctk.CTkFrame):
             text_color=("gray20", "gray80"),
             command=self.on_open_settings
         )
-        self.btn_settings.grid(row=0, column=2, sticky="e", padx=5)
+        self.btn_settings.pack(side="left")
 
     def _submit(self):
         url = self.entry.get().strip()
@@ -120,6 +139,16 @@ class UrlInputBar(ctk.CTkFrame):
 
     def _on_toggle_clip(self):
         self.on_clipboard_toggle(self.auto_clip_var.get())
+
+    def _on_click_sniffer(self):
+        if self.on_open_sniffer:
+            self.on_open_sniffer()
+
+    def update_sniffer_badge(self, count: int):
+        if count > 0:
+            self.btn_sniffer.configure(text=f"🌐 브라우저 감지기 ({count}개 발견)")
+        else:
+            self.btn_sniffer.configure(text="🌐 브라우저 감지기 (만능 스니퍼)")
 
     def set_url(self, url: str):
         self.entry.delete(0, "end")

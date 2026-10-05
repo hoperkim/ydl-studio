@@ -11,6 +11,7 @@ FONTS = {
     "body": (FONT_FAMILY, 14),
     "body_bold": (FONT_FAMILY, 14, "bold"),
     "caption": (FONT_FAMILY, 13),
+    "caption_bold": (FONT_FAMILY, 13, "bold"),
     "badge": (FONT_FAMILY, 12, "bold"),
 }
 

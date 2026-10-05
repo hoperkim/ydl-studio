@@ -1,4 +1,4 @@
-# ⚡ YDL Studio (v1.0.0 Modern)
+# ⚡ YDL Studio (v1.1.0 Universal)
 
 [![Release](https://img.shields.io/github/v/release/hoperkim/ydl-studio?color=green)](https://github.com/hoperkim/ydl-studio/releases/latest)
 [![Download](https://img.shields.io/badge/Download-YDL--Studio--v1.0.exe-brightgreen?logo=windows&logoColor=white)](https://github.com/hoperkim/ydl-studio/releases/download/v1.0.0/YDL-Studio-v1.0.exe)
@@ -7,26 +7,33 @@
 [![UI](https://img.shields.io/badge/GUI-CustomTkinter-blue)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**YDL Studio**는 유튜브를 비롯한 다양한 미디어 플랫폼(TikTok, X, Instagram, Bilibili 등)의 고화질 영상과 오디오를 가장 쉽고 편리하게 다운로드할 수 있도록 설계된 현대적인 Windows 데스크톱 애플리케이션입니다.
-
-기존의 투박한 Tkinter 인터페이스를 완전히 탈피하여, **CustomTkinter 기반의 세련된 다크 테마 대시보드**와 **카드형 작업 큐(Queue) 시스템**을 탑재하였습니다.
+**YDL Studio**는 유튜브, TikTok, X, Instagram뿐 아니라 **웹사이트 내 임베드 영상, HLS(.m3u8), DASH(.mpd), 그리고 크롬캐스트로 전송/재생되는 모든 브라우저 미디어 스트림까지 완벽하게 추출하고 다운로드**할 수 있는 만능 Windows 데스크톱 애플리케이션입니다.
 
 ---
 
 ## ✨ 핵심 기능 (Key Features)
 
-- 🎨 **모던 다크 UI (Modern Dark Theme)**: 세련되고 눈이 편안한 카드형 대시보드 디자인
-- 🔍 **실시간 메타데이터 미리보기**: URL 입력 시 다운로드 전 **썸네일, 제목, 채널명, 재생 시간, 사용 가능한 해상도**를 즉시 추출
-- 🎛️ **다양한 화질 & 오디오 프리셋**:
-  - 동영상: 4K (2160p), 2K (1440p), 1080p FHD, 720p HD, 480p 등
-  - 오디오 추출: MP3 (320kbps 최고음질, 192kbps 표준), M4A (무손실 AAC)
-- 📋 **클립보드 스마트 자동 감지**: 브라우저에서 유튜브 링크를 복사하면 프로그램이 자동으로 인식하여 입력창에 반영
-- 🍪 **브라우저 쿠키 원클릭 연동**: Chrome, Edge, Brave, Firefox 등의 로그인 세션을 연동하여 **유튜브 봇 감지(Sign-in Required) 및 연령 제한 완벽 우회**
-- 📊 **카드형 개별 큐 시스템**:
-  - 영상마다 개별 다운로드 진행률(%), 속도(MB/s), 남은 시간(ETA) 표시
-  - 다운로드 도중 언제든지 개별 **[취소]** 가능
-  - 다운로드 완료 시 **[📂 폴더 열기]** 원클릭 지원
-- ⚡ **인앱 원클릭 엔진 업데이트**: 유튜브 정책 변경 시 앱 설정 창에서 `yt-dlp` 최신 버전을 바로 업데이트 가능
+### 1. 🌐 실시간 브라우저 & 크롬캐스트 스트림 감지기 (New!)
+- **크롬 / 엣지 DevTools Protocol(CDP) 실시간 연동**:
+  - 버튼 하나로 전용 스니퍼 브라우저를 열고 원하는 사이트(OTT, 뉴스, 스트리밍, 커뮤니티 등)에서 영상을 재생하거나 **크롬캐스트로 전송(Cast)**하면 원본 스트림이 실시간으로 감지됩니다.
+- **인증 헤더 자동 주입**:
+  - Referer, Origin, User-Agent, Cookie 등 봇 차단 및 403 Forbidden 방지 헤더를 다운로드 엔진에 자동 전달하여 100% 성공률을 보장합니다.
+
+### 2. 🔍 딥 웹페이지 스캐너 (Deep Webpage Scanner)
+- 일반 웹사이트 URL을 입력창에 넣기만 해도 `curl_cffi` 기반 Chrome TLS 에뮬레이션을 통해 Cloudflare 방어를 우회하고, 페이지 내부의 iframe, 자바스크립트 플레이어(Hls.js, Video.js, JW Player 등)에서 숨겨진 `.m3u8` / `.mpd` / `.mp4` 주소를 자동 발굴합니다.
+
+### 3. 🔴 실시간 라이브 스트림 녹화 (Live Stream Recorder)
+- 유튜브 라이브, 트위치, 치지직, SOOP(아프리카), 맞춤 HLS 라이브 등 실시간 방송 스트림을 감지하여 실시간 녹화 모드를 지원합니다.
+- [⏹️ 녹화 종료] 버튼 클릭 시 녹화된 구간을 FFmpeg로 손실 없이 안전하게 MP4 파일로 마무리 저장합니다.
+
+### 4. 🎛️ 다양한 화질 & 프리셋 & FFmpeg Fallback
+- **동영상**: 4K (2160p), 2K (1440p), 1080p FHD, 720p HD, 480p 등 (M3U8 마스터 플레이리스트 해상도 자동 분석)
+- **오디오**: MP3 (320kbps 최고음질, 192kbps), M4A (무손실 AAC)
+- **FFmpeg 직접 스트림 Fallback**: yt-dlp로 처리하기 어려운 특수 스트림도 내장 FFmpeg 파이프라인으로 무결점 병합 다운로드
+
+### 5. 🎨 세련된 CustomTkinter 다크 테마 대시보드
+- 개별 카드형 큐 시스템 (진행률 %, 속도 MB/s, 남은 시간 ETA, 실시간 취소, 원클릭 [📂 폴더 열기])
+- 클립보드 링크 스마트 자동 감지 및 인앱 yt-dlp 원클릭 업데이트
 
 ---
 
@@ -35,38 +42,40 @@
 ### 1. 소스코드에서 실행
 
 ```bash
-# 1. 리포지토리 클론
-git clone https://github.com/hoperkim/ydl-studio.git
+# 1. 리포지토리 이동
 cd ydl-studio
 
-# 2. 가상환경 생성 및 활성화
-python -m venv .venv
+# 2. 가상환경 활성화 (또는 새로 생성)
 .\.venv\Scripts\activate
 
 # 3. 필수 패키지 설치
 pip install -r requirements.txt
 
-# 4. 실행
+# 4. 앱 실행
 python main.py
+# 또는 간편 실행
+run.bat
 ```
 
 ### 2. 단일 실행 파일(.exe) 빌드
 
 ```bash
-pip install pyinstaller
 pyinstaller "YDL Studio.spec"
 ```
-빌드가 완료되면 `dist/YDL Studio.exe` 파일 하나로 모든 PC에서 바로 실행할 수 있습니다.
+빌드 완료 시 `dist/YDL Studio.exe` 파일 하나로 배포 및 실행 가능합니다.
 
 ---
 
-## 🛠️ 사용 방법 (How to Use)
+## 🛠️ 사용 시나리오
 
-1. **URL 추가**: 유튜브 링크를 복사하여 상단 입력창에 넣고 **[⚡ 영상 추가]** 버튼을 누릅니다. (클립보드 자동 감지가 켜져 있으면 복사 시 자동 감지)
-2. **옵션 선택**: 추가된 카드에서 원하는 화질(4K, 1080p, MP3 등)을 선택합니다.
-3. **다운로드**: **[⬇️ 다운로드]** 버튼을 누르면 실시간 진행률과 다운로드 속도가 표시됩니다.
-4. **완료**: 다운로드가 완료되면 **[📂 폴더 열기]** 버튼을 눌러 저장된 파일을 확인합니다.
-5. **설정**: 우측 상단 **[⚙️ 환경 설정]**에서 기본 저장 폴더 변경, 브라우저 쿠키 연동, yt-dlp 엔진 업데이트를 수행할 수 있습니다.
+1. **유튜브 / 인스타 / 틱톡 등 일반 영상**:
+   - 주소 복사 후 상단 입력창에 붙여넣고 **[⚡ 영상 추가]** 클릭
+2. **다운로드가 안 되는 일반 웹사이트 / 크롬캐스트 전송 영상**:
+   - 상단의 **[🌐 브라우저 감지기 (만능 스니퍼)]** 클릭
+   - 팝업에서 **[🚀 브라우저 열기]** 클릭 후 해당 웹사이트에서 영상 재생 (또는 크롬캐스트 전송)
+   - 실시간 감지 목록에 뜬 항목의 **[📥 대기열 추가]** 클릭 후 다운로드!
+3. **실시간 라이브 방송**:
+   - 카드가 라이브 방송(`🔴 LIVE`)으로 표시되며 **[🔴 녹화 시작]**을 누르고, 원하는 시점에 **[⏹️ 녹화 종료]**를 누르면 끝!
 
 ---
 

@@ -20,6 +20,7 @@ def get_config_path() -> str:
 DEFAULT_CONFIG: Dict[str, Any] = {
     "download_dir": os.path.join(os.path.expanduser("~"), "Downloads"),
     "browser_cookie": None,
+    "preferred_browser": "auto",
     "theme": "Dark",
     "auto_clipboard": True,
 }

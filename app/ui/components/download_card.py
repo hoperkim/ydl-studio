@@ -1,6 +1,7 @@
 """
 Download Card Component representing a queued or active download.
-Features thumbnail, title, channel info, preset selector, progress bar, cancel, and folder open.
+Features thumbnail, platform badge, title, channel info, preset selector, progress bar,
+live recording stop control, cancel, and folder open.
 """
 import os
 import subprocess
@@ -39,6 +40,7 @@ class DownloadCard(ctk.CTkFrame):
         self.get_browser_cookie = get_browser_cookie
         self.on_remove = on_remove
 
+        self.is_live = bool(info.get('is_live', False))
         self.task: Optional[DownloadTask] = None
         self.output_filepath: Optional[str] = None
         self.is_downloading = False
@@ -64,10 +66,41 @@ class DownloadCard(ctk.CTkFrame):
         # 2. Top-Right: Title & Remove button
         header_frame = ctk.CTkFrame(self, fg_color="transparent")
         header_frame.grid(row=0, column=1, sticky="ew", padx=(0, 12), pady=(12, 0))
-        header_frame.grid_columnconfigure(0, weight=1)
+        header_frame.grid_columnconfigure(1, weight=1)
+
+        # Platform / Stream Type Badge
+        stream_type = self.info.get('stream_type', '영상')
+        badge_color = "#3b82f6"
+        if self.is_live:
+            badge_color = "#ef4444"
+            badge_text = "🔴 LIVE"
+        elif "m3u8" in stream_type.lower() or "hls" in stream_type.lower():
+            badge_color = "#ec4899"
+            badge_text = "HLS (m3u8)"
+        elif "mpd" in stream_type.lower() or "dash" in stream_type.lower():
+            badge_color = "#8b5cf6"
+            badge_text = "DASH (mpd)"
+        elif "tiktok" in stream_type.lower():
+            badge_color = "#06b6d4"
+            badge_text = "TikTok"
+        elif "twitter" in stream_type.lower() or "x" in stream_type.lower():
+            badge_color = "#64748b"
+            badge_text = "X"
+        else:
+            badge_text = stream_type
+
+        self.badge_label = ctk.CTkLabel(
+            header_frame,
+            text=f" {badge_text} ",
+            font=FONTS["caption_bold"],
+            text_color="white",
+            fg_color=badge_color,
+            corner_radius=5
+        )
+        self.badge_label.grid(row=0, column=0, padx=(0, 8), sticky="w")
 
         raw_title = self.info.get('title', '영상 제목')
-        title_text = raw_title if len(raw_title) <= 55 else raw_title[:52] + "..."
+        title_text = raw_title if len(raw_title) <= 50 else raw_title[:47] + "..."
         self.title_label = ctk.CTkLabel(
             header_frame,
             text=title_text,
@@ -75,7 +108,7 @@ class DownloadCard(ctk.CTkFrame):
             anchor="w",
             justify="left"
         )
-        self.title_label.grid(row=0, column=0, sticky="w")
+        self.title_label.grid(row=0, column=1, sticky="w")
 
         # Close/Remove button [✕]
         self.btn_close = ctk.CTkButton(
@@ -89,12 +122,16 @@ class DownloadCard(ctk.CTkFrame):
             text_color=("gray40", "gray70"),
             command=self._handle_remove
         )
-        self.btn_close.grid(row=0, column=1, sticky="e")
+        self.btn_close.grid(row=0, column=2, sticky="e")
 
         # Subtitle: Channel name and duration
         channel = self.info.get('channel', '채널명')
         duration_str = self.info.get('duration_str', '')
-        info_sub = f"📺 {channel}" + (f"  •  ⏱️ {duration_str}" if duration_str else "")
+        if self.is_live:
+            info_sub = f"📺 {channel}  •  🔴 실시간 방송 (원하는 만큼 녹화 후 종료)"
+        else:
+            info_sub = f"📺 {channel}" + (f"  •  ⏱️ {duration_str}" if duration_str else "")
+
         self.sub_label = ctk.CTkLabel(
             header_frame,
             text=info_sub,
@@ -102,7 +139,7 @@ class DownloadCard(ctk.CTkFrame):
             text_color=COLORS["text_muted"],
             anchor="w"
         )
-        self.sub_label.grid(row=1, column=0, columnspan=2, sticky="w", pady=(2, 4))
+        self.sub_label.grid(row=1, column=0, columnspan=3, sticky="w", pady=(2, 4))
 
         # 3. Middle-Right: Option selector & Action buttons
         ctrl_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -123,15 +160,19 @@ class DownloadCard(ctk.CTkFrame):
         )
         self.opt_preset.grid(row=0, column=0, sticky="w", padx=(0, 8))
 
-        # Action button (Download / Cancel / Open Folder)
+        # Action button (Download / Live Record / Cancel / Open Folder)
+        btn_action_text = "🔴 녹화 시작" if self.is_live else "⬇️ 다운로드"
+        btn_action_color = "#ef4444" if self.is_live else COLORS["accent_primary"]
+        btn_action_hover = "#dc2626" if self.is_live else COLORS["accent_hover"]
+
         self.btn_action = ctk.CTkButton(
             ctrl_frame,
-            text="⬇️ 다운로드",
+            text=btn_action_text,
             width=110,
             height=34,
             font=FONTS["body_bold"],
-            fg_color=COLORS["accent_primary"],
-            hover_color=COLORS["accent_hover"],
+            fg_color=btn_action_color,
+            hover_color=btn_action_hover,
             command=self._toggle_download
         )
         self.btn_action.grid(row=0, column=1, padx=(0, 6))
@@ -198,28 +239,40 @@ class DownloadCard(ctk.CTkFrame):
 
     def _toggle_download(self):
         if self.is_downloading:
-            # Cancel
+            # Cancel or Stop Live Recording
             if self.task:
                 self.task.cancel()
             self.is_downloading = False
-            self.btn_action.configure(
-                text="⬇️ 다시 받기",
-                fg_color=COLORS["accent_primary"],
-                hover_color=COLORS["accent_hover"]
-            )
-            self.status_label.configure(text="다운로드 취소됨", text_color=COLORS["accent_warning"])
+            if self.is_live:
+                self.btn_action.configure(
+                    text="🔴 다시 녹화",
+                    fg_color="#ef4444",
+                    hover_color="#dc2626"
+                )
+                self.status_label.configure(text="녹화가 중지되었습니다.", text_color=COLORS["accent_warning"])
+            else:
+                self.btn_action.configure(
+                    text="⬇️ 다시 받기",
+                    fg_color=COLORS["accent_primary"],
+                    hover_color=COLORS["accent_hover"]
+                )
+                self.status_label.configure(text="다운로드 취소됨", text_color=COLORS["accent_warning"])
             self.opt_preset.configure(state="normal")
         else:
             # Start
             self.is_downloading = True
             self.opt_preset.configure(state="disabled")
+            stop_btn_text = "⏹️ 녹화 종료" if self.is_live else "⏹️ 취소"
             self.btn_action.configure(
-                text="⏹️ 취소",
+                text=stop_btn_text,
                 fg_color=COLORS["accent_danger"],
                 hover_color="#DC2626"
             )
             self.progress_bar.set(0.0)
-            self.status_label.configure(text="다운로드 시작…", text_color=COLORS["text_muted"])
+            self.status_label.configure(
+                text="녹화 시작…" if self.is_live else "다운로드 시작…",
+                text_color=COLORS["text_muted"]
+            )
             self.speed_label.configure(text="")
 
             save_dir = self.get_download_dir()
@@ -230,6 +283,9 @@ class DownloadCard(ctk.CTkFrame):
                 save_dir=save_dir,
                 preset=self.preset_var.get(),
                 browser_cookie=browser_cookie,
+                headers=self.info.get('headers'),
+                is_live=self.is_live,
+                title=self.info.get('title'),
                 on_progress=self._on_progress,
                 on_status_change=self._on_status_change,
                 on_finish=self._on_finish,
@@ -239,18 +295,25 @@ class DownloadCard(ctk.CTkFrame):
 
     def _on_progress(self, percent: float, speed_str: str, eta_str: str):
         def _update():
-            self.progress_bar.set(percent / 100.0)
-            meta_parts = [f"{percent:.1f}%"]
-            if speed_str:
-                meta_parts.append(speed_str)
-            self.status_label.configure(text=" • ".join(meta_parts))
-            self.speed_label.configure(text=eta_str)
+            if not self.is_live:
+                self.progress_bar.set(percent / 100.0)
+                meta_parts = [f"{percent:.1f}%"]
+                if speed_str:
+                    meta_parts.append(speed_str)
+                self.status_label.configure(text=" • ".join(meta_parts))
+                self.speed_label.configure(text=eta_str)
+            else:
+                self.progress_bar.set(1.0)
+                self.progress_bar.configure(progress_color="#ef4444")
+                self.speed_label.configure(text=eta_str)
         self.after(0, _update)
 
     def _on_status_change(self, status: str, message: str):
         def _update():
             if status == "PROCESSING":
                 self.status_label.configure(text=message, text_color=COLORS["accent_primary"])
+            elif status == "LIVE_RECORDING":
+                self.status_label.configure(text=message, text_color="#ef4444")
             elif status == "CANCELLED":
                 self.status_label.configure(text=message, text_color=COLORS["accent_warning"])
             elif status == "FINISHED":
