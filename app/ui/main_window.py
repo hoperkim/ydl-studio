@@ -34,7 +34,7 @@ class MainWindow(ctk.CTk):
         ctk.set_appearance_mode(self.config.get("theme", "Dark"))
         ctk.set_default_color_theme("blue")
 
-        self.title("YDL Studio - 모던 만능 미디어 다운로더")
+        self.title("YDL Studio v1.2.0 - 모던 만능 미디어 다운로더 (2026-10-15 업데이트)")
         self.geometry("920x720")
         self.minsize(820, 580)
 
@@ -115,7 +115,7 @@ class MainWindow(ctk.CTk):
 
         title_label = ctk.CTkLabel(
             header_frame,
-            text="YDL Studio",
+            text="YDL Studio v1.2.0",
             font=FONTS["title"],
             text_color=COLORS["accent_primary"],
             anchor="w"
@@ -124,7 +124,7 @@ class MainWindow(ctk.CTk):
 
         subtitle_label = ctk.CTkLabel(
             header_frame,
-            text="만능 미디어 다운로더 • YouTube, SNS, 웹 비디오 & 실시간 크롬캐스트 스트림 감지",
+            text="만능 미디어 다운로더 • 2026-10-15 최신 업데이트 • YouTube, SNS, 보안 웹 비디오 & 크롬캐스트 지원",
             font=FONTS["body"],
             text_color=COLORS["text_muted"],
             anchor="w"
@@ -186,7 +186,7 @@ class MainWindow(ctk.CTk):
         engine_ver = get_current_version()
         self.lbl_engine = ctk.CTkLabel(
             status_bar,
-            text=f"만능 엔진 v{engine_ver}",
+            text=f"만능 엔진 v{engine_ver} • 2026.10.15 패치",
             font=FONTS["caption"],
             text_color=COLORS["text_muted"]
         )
@@ -222,14 +222,15 @@ class MainWindow(ctk.CTk):
                     self._add_card(info)
                 self.after(0, _success)
             except Exception as e:
-                def _error():
+                err_msg = str(e)
+                def _error(msg=err_msg):
                     try:
                         loading_popup.destroy()
                     except Exception:
                         pass
                     messagebox.showerror(
                         "분석 실패",
-                        f"영상 정보를 가져오지 못했습니다:\n{e}\n\n"
+                        f"영상 정보를 가져오지 못했습니다:\n{msg}\n\n"
                         "💡 팁: 일반적인 방법으로 분석되지 않는 복잡한 사이트는 상단의 [🌐 브라우저 감지기]를 켜고 브라우저에서 직접 영상을 재생하면 100% 감지됩니다!"
                     )
                 self.after(0, _error)
@@ -253,8 +254,9 @@ class MainWindow(ctk.CTk):
                     self._add_card(info)
                 self.after(0, _success)
             except Exception as e:
-                def _error():
-                    messagebox.showerror("스트림 추가 실패", f"스트림 분석 실패: {e}")
+                err_msg = str(e)
+                def _error(msg=err_msg):
+                    messagebox.showerror("스트림 추가 실패", f"스트림 분석 실패: {msg}")
                 self.after(0, _error)
 
         threading.Thread(target=_worker, daemon=True).start()
@@ -371,3 +373,17 @@ class MainWindow(ctk.CTk):
         except Exception:
             pass
         self.destroy()
+
+    def report_callback_exception(self, exc, val, tb):
+        """Safe exception reporter preventing OSError 22 on Windows GUI without console."""
+        try:
+            import traceback, sys
+            err_msg = "".join(traceback.format_exception(exc, val, tb))
+            if sys.stderr and hasattr(sys.stderr, "write"):
+                try:
+                    sys.stderr.write(err_msg)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+

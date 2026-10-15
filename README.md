@@ -1,4 +1,4 @@
-# ⚡ YDL Studio (v1.1.0 Universal)
+# ⚡ YDL Studio (v1.2.0 Universal • 2026-10-15 업데이트)
 
 [![Release](https://img.shields.io/github/v/release/hoperkim/ydl-studio?color=green)](https://github.com/hoperkim/ydl-studio/releases/latest)
 [![Download](https://img.shields.io/badge/Download-YDL--Studio--v1.0.exe-brightgreen?logo=windows&logoColor=white)](https://github.com/hoperkim/ydl-studio/releases/download/v1.0.0/YDL-Studio-v1.0.exe)
@@ -7,13 +7,22 @@
 [![UI](https://img.shields.io/badge/GUI-CustomTkinter-blue)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**YDL Studio**는 유튜브, TikTok, X, Instagram뿐 아니라 **웹사이트 내 임베드 영상, HLS(.m3u8), DASH(.mpd), 그리고 크롬캐스트로 전송/재생되는 모든 브라우저 미디어 스트림까지 완벽하게 추출하고 다운로드**할 수 있는 만능 Windows 데스크톱 애플리케이션입니다.
+**YDL Studio**는 유튜브, TikTok, X, Instagram뿐 아니라 **보안 세션 잠금 사이트(upload18.org 등), 웹사이트 내 임베드 영상, HLS(.m3u8), DASH(.mpd), 그리고 크롬캐스트로 전송/재생되는 모든 브라우저 미디어 스트림까지 완벽하게 추출하고 다운로드**할 수 있는 만능 Windows 데스크톱 애플리케이션입니다.
+
+---
+
+## 📅 2026-10-15 최신 업데이트 (v1.2.0)
+- 🛡️ **보안 브라우저 세션 다운로더 (`BrowserStreamDownloader`) 탑재**:
+  - `upload18.org` 등 Cloudflare, 동적 IP 바인딩, 무확장자 HLS 세그먼트, `Range: bytes=0-` 검증 사이트 완벽 지원
+  - 브라우저 CDP 내부 병렬 `fetch()` 파이프라인으로 13+ MB/s 초고속 무손실 수집 및 FFmpeg 자동 병합
+- 🐞 **안정성 패치**: Tkinter 비동기 예외 콜백 스코프 버그(`NameError: 'e'`) 및 `OSError: [Errno 22]` 완전 차단 패치
+- ⌨️ **독립 CLI 스크립트 추가**: 터미널에서 즉시 실행 가능한 `download_upload18.py` 제공
 
 ---
 
 ## ✨ 핵심 기능 (Key Features)
 
-### 1. 🌐 실시간 브라우저 & 크롬캐스트 스트림 감지기 (New!)
+### 1. 🌐 실시간 브라우저 & 크롬캐스트 스트림 감지기 (CDP Sniffer)
 - **크롬 / 엣지 DevTools Protocol(CDP) 실시간 연동**:
   - 버튼 하나로 전용 스니퍼 브라우저를 열고 원하는 사이트(OTT, 뉴스, 스트리밍, 커뮤니티 등)에서 영상을 재생하거나 **크롬캐스트로 전송(Cast)**하면 원본 스트림이 실시간으로 감지됩니다.
 - **인증 헤더 자동 주입**:
