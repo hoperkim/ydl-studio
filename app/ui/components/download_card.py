@@ -286,6 +286,7 @@ class DownloadCard(ctk.CTkFrame):
                 headers=self.info.get('headers'),
                 is_live=self.is_live,
                 title=self.info.get('title'),
+                use_browser_fetcher=self.info.get('use_browser_fetcher', False),
                 on_progress=self._on_progress,
                 on_status_change=self._on_status_change,
                 on_finish=self._on_finish,

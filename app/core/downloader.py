@@ -26,6 +26,7 @@ class DownloadTask:
         headers: Optional[Dict[str, str]] = None,
         is_live: bool = False,
         title: Optional[str] = None,
+        use_browser_fetcher: bool = False,
         embed_thumb: bool = True,
         embed_metadata: bool = True,
         auto_subs: bool = False,
@@ -42,6 +43,7 @@ class DownloadTask:
         self.headers = headers or {}
         self.is_live = is_live
         self.title = title or "media"
+        self.use_browser_fetcher = use_browser_fetcher or ("upload18.org" in self.url)
         self.embed_thumb = embed_thumb
         self.embed_metadata = embed_metadata
         self.auto_subs = auto_subs
@@ -57,6 +59,7 @@ class DownloadTask:
         self.start_time = 0.0
         self.thread: Optional[threading.Thread] = None
         self.ffmpeg_proc: Optional[subprocess.Popen] = None
+        self.browser_dl: Optional[Any] = None
         self.output_filepath: Optional[str] = None
         self.last_part_file: Optional[str] = None
 
@@ -67,6 +70,11 @@ class DownloadTask:
             return
 
         self.is_cancelled = True
+        if self.browser_dl:
+            try:
+                self.browser_dl.cancel()
+            except Exception:
+                pass
         if self.ffmpeg_proc:
             try:
                 self.ffmpeg_proc.terminate()
@@ -223,6 +231,10 @@ class DownloadTask:
         return opts
 
     def _run(self) -> None:
+        if self.use_browser_fetcher:
+            self._run_browser_fetcher()
+            return
+
         try:
             if self.on_status_change:
                 status_msg = "실시간 방송 녹화 시작 중…" if self.is_live else "다운로드 준비 중…"
@@ -383,3 +395,25 @@ class DownloadTask:
             self.on_status_change("FINISHED", "녹화가 중지되었습니다.")
         if self.on_finish:
             self.on_finish(self.save_dir)
+
+    def _run_browser_fetcher(self) -> None:
+        """Download stream via authenticated in-browser fetch pipeline."""
+        from app.core.browser_fetcher import BrowserStreamDownloader
+        import asyncio
+
+        self.browser_dl = BrowserStreamDownloader(
+            page_url=self.url,
+            output_dir=self.save_dir,
+            on_progress=self.on_progress,
+            on_status=self.on_status_change,
+            on_finish=self.on_finish
+        )
+        try:
+            final_file = asyncio.run(self.browser_dl.run_async())
+            self.output_filepath = final_file
+        except Exception as e:
+            if not self.is_cancelled:
+                if self.on_status_change:
+                    self.on_status_change("ERROR", f"오류: {e}")
+                if self.on_error:
+                    self.on_error(str(e))
