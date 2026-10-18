@@ -473,7 +473,8 @@ class BrowserStreamDownloader:
                 if self.on_status:
                     self.on_status("PROCESSING", f"FFmpeg {out_ext.upper()} 변환 및 후처리 중…")
 
-                ffmpeg_bin = shutil.which("ffmpeg") or r"C:\FFmpeg\bin\ffmpeg.exe"
+                from app.utils.ffmpeg_manager import find_ffmpeg_binary
+                ffmpeg_bin = find_ffmpeg_binary() or shutil.which("ffmpeg") or r"C:\FFmpeg\bin\ffmpeg.exe"
                 if is_audio_preset:
                     if out_ext == "flac":
                         cmd_ffmpeg = [ffmpeg_bin, "-y", "-i", ts_output_path, "-vn", "-c:a", "flac", final_output_path]

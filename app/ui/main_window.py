@@ -56,6 +56,7 @@ class MainWindow(ctk.CTk):
 
         self._build_layout()
         self._start_clipboard_monitor()
+        self._init_portable_ffmpeg()
 
         # Global Ctrl+V shortcut when entry is not focused
         self.bind("<Control-v>", self._on_global_paste)
@@ -523,6 +524,28 @@ class MainWindow(ctk.CTk):
             self.after(1200, _poll)
 
         self.after(1200, _poll)
+
+    def _init_portable_ffmpeg(self):
+        """Ensure portable FFmpeg is located or automatically bootstrapped on clean PCs."""
+        from app.utils.ffmpeg_manager import ensure_ffmpeg_async
+
+        def _on_status(msg: str):
+            def _ui():
+                if self.winfo_exists():
+                    self.lbl_engine.configure(text=msg, text_color=COLORS["accent_primary"])
+            self.after(0, _ui)
+
+        def _on_ready(ok: bool, info_str: str):
+            def _ui():
+                if self.winfo_exists():
+                    engine_ver = get_current_version()
+                    self.lbl_engine.configure(
+                        text=f"만능 엔진 v{engine_ver} • 포터블 FFmpeg 준비됨",
+                        text_color=COLORS["text_muted"]
+                    )
+            self.after(0, _ui)
+
+        ensure_ffmpeg_async(on_status=_on_status, on_ready=_on_ready)
 
     def _on_window_close(self):
         """Clean shutdown hook."""

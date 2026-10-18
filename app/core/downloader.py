@@ -163,6 +163,9 @@ class DownloadTask:
     def _build_ydl_opts(self) -> Dict[str, Any]:
         is_explicit_playlist = any(p in self.url.lower() for p in ["/playlist", "/sets/", "/album/"])
         outtmpl = os.path.join(self.save_dir, '%(title).150B [%(id)s].%(ext)s')
+        from app.utils.ffmpeg_manager import find_ffmpeg_binary
+        ff_bin = find_ffmpeg_binary()
+
         opts: Dict[str, Any] = {
             'outtmpl': outtmpl,
             'progress_hooks': [self._progress_hook],
@@ -176,6 +179,9 @@ class DownloadTask:
             'file_access_retries': 5,
             'postprocessors': [],
         }
+
+        if ff_bin:
+            opts['ffmpeg_location'] = os.path.dirname(ff_bin)
 
         if self.headers:
             opts['http_headers'] = self.headers
@@ -350,7 +356,8 @@ class DownloadTask:
 
     def _run_ffmpeg_fallback(self) -> None:
         """Direct stream download fallback using FFmpeg (supports both Video MP4 and Audio MP3/FLAC/M4A)."""
-        ffmpeg_bin = shutil.which("ffmpeg") or r"C:\FFmpeg\bin\ffmpeg.exe"
+        from app.utils.ffmpeg_manager import find_ffmpeg_binary
+        ffmpeg_bin = find_ffmpeg_binary() or shutil.which("ffmpeg") or r"C:\FFmpeg\bin\ffmpeg.exe"
         if not os.path.exists(ffmpeg_bin) and not shutil.which("ffmpeg"):
             raise RuntimeError("FFmpeg를 찾을 수 없습니다.")
 
