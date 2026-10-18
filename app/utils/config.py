@@ -9,7 +9,7 @@ from typing import Any, Dict
 
 
 def get_config_path() -> str:
-    """Get the path for config.json in the user data directory or app root."""
+    """Get the path for ydl_settings.json in the user data directory or app root."""
     if getattr(sys, 'frozen', False):
         base_dir = os.path.dirname(sys.executable)
     else:
@@ -23,6 +23,8 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "preferred_browser": "auto",
     "theme": "Dark",
     "auto_clipboard": True,
+    "auto_start_download": True,
+    "intent_mode": "auto",
 }
 
 

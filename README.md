@@ -1,90 +1,57 @@
-# ⚡ YDL Studio (v1.2.0 Universal • 2026-10-15 업데이트)
+# ⚡ YDL Studio (v2.0.0 Smart Zero-Click • 2026-10-19 업데이트)
 
 [![Release](https://img.shields.io/github/v/release/hoperkim/ydl-studio?color=green)](https://github.com/hoperkim/ydl-studio/releases/latest)
-[![Download](https://img.shields.io/badge/Download-YDL--Studio--v1.2.0.exe-brightgreen?logo=windows&logoColor=white)](https://github.com/hoperkim/ydl-studio/releases/download/v1.2.0/YDL-Studio-v1.2.0.exe)
+[![Download](https://img.shields.io/badge/Download-YDL--Studio--v2.0.0.exe-brightgreen?logo=windows&logoColor=white)](https://github.com/hoperkim/ydl-studio/releases/download/v2.0.0/YDL-Studio-v2.0.0.exe)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![yt-dlp](https://img.shields.io/badge/Engine-yt--dlp-FF0000?logo=youtube&logoColor=white)](https://github.com/yt-dlp/yt-dlp)
 [![UI](https://img.shields.io/badge/GUI-CustomTkinter-blue)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**YDL Studio**는 유튜브, TikTok, X, Instagram뿐 아니라 **보안 세션 잠금 사이트(upload18.org 등), 웹사이트 내 임베드 영상, HLS(.m3u8), DASH(.mpd), 그리고 크롬캐스트로 전송/재생되는 모든 브라우저 미디어 스트림까지 완벽하게 추출하고 다운로드**할 수 있는 만능 Windows 데스크톱 애플리케이션입니다.
+**YDL Studio v2.0.0**은 **주소만 복사·붙여넣기(`Ctrl+V` 또는 원클릭 복붙)하면 프로그램이 알아서 영상(MP4)인지 음원(MP3/FLAC)인지 의도를 자동 판별하여 클릭 한 번 없이 즉시 다운로드**해 주는 차세대 만능 미디어 & 음원 다운로더입니다.
 
 ---
 
-## 📅 2026-10-15 최신 업데이트 (v1.2.0)
-- 🛡️ **보안 브라우저 세션 다운로더 (`BrowserStreamDownloader`) 탑재**:
-  - `upload18.org` 등 Cloudflare, 동적 IP 바인딩, 무확장자 HLS 세그먼트, `Range: bytes=0-` 검증 사이트 완벽 지원
-  - 브라우저 CDP 내부 병렬 `fetch()` 파이프라인으로 13+ MB/s 초고속 무손실 수집 및 FFmpeg 자동 병합
-- 🐞 **안정성 패치**: Tkinter 비동기 예외 콜백 스코프 버그(`NameError: 'e'`) 및 `OSError: [Errno 22]` 완전 차단 패치
-- ⌨️ **독립 CLI 스크립트 추가**: 터미널에서 즉시 실행 가능한 `download_upload18.py` 제공
+## 🚀 v2.0.0 핵심 업그레이드 (2026-10-19)
+
+1. **⚡ 무클릭 원스톱 자동 다운로드 (Zero-Click Auto-Start)**:
+   - 기존처럼 분석 팝업을 기다린 뒤 카드마다 `[다운로드]` 버튼을 또 누를 필요가 없습니다.
+   - 주소 입력 또는 **`[📋 원클릭 복붙]` (단축키 `Ctrl+V`)**만 누르면, 화면 멈춤 없는 **인라인 비동기 분석 후 즉시 다운로드가 자동 시작**됩니다.
+   - 여러 개의 링크를 한꺼번에 복사해서 붙여넣어도 자동으로 분리하여 동시 큐에 등록합니다.
+2. **🤖 스마트 영상·음원 의도 자동 판별 & 음원 브릿지 (Smart Media Intent)**:
+   - **음원/뮤직 링크 자동 인식**: YouTube Music, SoundCloud, Bandcamp, Mixcloud 및 **멜론(Melon), 스포티파이(Spotify), 지니, 벅스, Apple Music** 트랙 링크나 `.mp3`/`.flac` 주소를 붙여넣으면 자동으로 **고음질 음원 추출(`MP3 320kbps` + 앨범 커버 아트 & ID3 태그 내장)** 모드로 전환되어 다운로드됩니다!
+   - **상단 원클릭 모드 스위치**:
+     - `🤖 스마트 자동 (영상·음원 자동)` *(기본값)*
+     - `🎬 최고화질 영상 (MP4 고정)`
+     - `🎵 최고음질 음원 (MP3 320k)`
+     - `🎼 무손실 음원 (FLAC)`
+     - `📺 1080p FHD 영상 (MP4)`
+   - **유튜브 믹스(Mix/Radio) 자동 정제**: `watch?v=...&list=RD...` 형태의 링크를 붙여넣을 때 원치 않는 50곡 재생목록 전체가 걸리는 현상을 자동으로 차단하여 **의도한 해당 영상/곡만 1초 만에 즉시 추출**합니다.
+3. **🛡️ 4단계 만능 스트림 돌파 엔진 (Zero Dead-Ends Pipeline)**:
+   - **1단계 (`yt-dlp` 8배속 터보 엔진)**: 8개 세그먼트 동시 병렬 다운로드(`concurrent_fragment_downloads=8`) 및 브라우저 쿠키 충돌 자동 복구.
+   - **2단계 (`DeepWebScanner` 난독화 해독기)**: 웹페이지 HTML, `<iframe>`, Base64(`atob`), 그리고 스트리밍 사이트들이 주로 쓰는 **`eval(function(p,a,c,k,e,d))` 패킹 자바스크립트**를 자체 해독하여 숨겨진 `.m3u8` / `.mpd` / `.mp4` / `.mp3` 원본 주소를 추출합니다.
+   - **3단계 (`FFmpeg` 다이렉트 스트림 리먹서)**: 특수 HLS/DASH 스트림을 무손실 MP4 또는 고음질 MP3/FLAC으로 직접 변환합니다.
+   - **4단계 (`Universal Browser Session` 자동 우회)**: `upload18.org` 등 Cloudflare, 동적 토큰, 세션 잠금이 걸린 모든 웹사이트에서 1~3단계가 막히면 **사용자가 수동으로 스니퍼를 켤 필요 없이 자동으로 백그라운드 브라우저 보안 세션을 가동**하여 마스터 M3U8, 상대 경로 세그먼트, AES-128 암호화 스트림까지 100% 자동 수집·병합합니다!
+4. **▶️ 완료 즉시 `[▶️ 바로 재생]` 및 일괄 큐 제어**:
+   - 다운로드가 완료된 카드는 `[▶️ 바로 재생]`과 `[📂 폴더 열기]` 버튼을 제공하며, 하단 상태바에서 `[⬇️ 대기항목 전체 시작]`, `[🧹 완료 정리]`, `[📁 저장 폴더 열기]`를 원클릭으로 제어할 수 있습니다.
 
 ---
 
-## ✨ 핵심 기능 (Key Features)
+## 💻 빠른 시작 (Getting Started)
 
-### 1. 🌐 실시간 브라우저 & 크롬캐스트 스트림 감지기 (CDP Sniffer)
-- **크롬 / 엣지 DevTools Protocol(CDP) 실시간 연동**:
-  - 버튼 하나로 전용 스니퍼 브라우저를 열고 원하는 사이트(OTT, 뉴스, 스트리밍, 커뮤니티 등)에서 영상을 재생하거나 **크롬캐스트로 전송(Cast)**하면 원본 스트림이 실시간으로 감지됩니다.
-- **인증 헤더 자동 주입**:
-  - Referer, Origin, User-Agent, Cookie 등 봇 차단 및 403 Forbidden 방지 헤더를 다운로드 엔진에 자동 전달하여 100% 성공률을 보장합니다.
+### 1. 단일 실행 파일(`.exe`) 다운로드 및 실행
+파이썬 설치 없이 [Releases 페이지](https://github.com/hoperkim/ydl-studio/releases/latest)에서 **`YDL-Studio-v2.0.0.exe`**를 다운로드하여 바로 실행하세요.
 
-### 2. 🔍 딥 웹페이지 스캐너 (Deep Webpage Scanner)
-- 일반 웹사이트 URL을 입력창에 넣기만 해도 `curl_cffi` 기반 Chrome TLS 에뮬레이션을 통해 Cloudflare 방어를 우회하고, 페이지 내부의 iframe, 자바스크립트 플레이어(Hls.js, Video.js, JW Player 등)에서 숨겨진 `.m3u8` / `.mpd` / `.mp4` 주소를 자동 발굴합니다.
-
-### 3. 🔴 실시간 라이브 스트림 녹화 (Live Stream Recorder)
-- 유튜브 라이브, 트위치, 치지직, SOOP(아프리카), 맞춤 HLS 라이브 등 실시간 방송 스트림을 감지하여 실시간 녹화 모드를 지원합니다.
-- [⏹️ 녹화 종료] 버튼 클릭 시 녹화된 구간을 FFmpeg로 손실 없이 안전하게 MP4 파일로 마무리 저장합니다.
-
-### 4. 🎛️ 다양한 화질 & 프리셋 & FFmpeg Fallback
-- **동영상**: 4K (2160p), 2K (1440p), 1080p FHD, 720p HD, 480p 등 (M3U8 마스터 플레이리스트 해상도 자동 분석)
-- **오디오**: MP3 (320kbps 최고음질, 192kbps), M4A (무손실 AAC)
-- **FFmpeg 직접 스트림 Fallback**: yt-dlp로 처리하기 어려운 특수 스트림도 내장 FFmpeg 파이프라인으로 무결점 병합 다운로드
-
-### 5. 🎨 세련된 CustomTkinter 다크 테마 대시보드
-- 개별 카드형 큐 시스템 (진행률 %, 속도 MB/s, 남은 시간 ETA, 실시간 취소, 원클릭 [📂 폴더 열기])
-- 클립보드 링크 스마트 자동 감지 및 인앱 yt-dlp 원클릭 업데이트
-
----
-
-## 🚀 빠른 시작 (Getting Started)
-
-### 1. 소스코드에서 실행
+### 2. 소스 코드에서 실행 및 빌드
 
 ```bash
-# 1. 리포지토리 이동
-cd ydl-studio
-
-# 2. 가상환경 활성화 (또는 새로 생성)
+# 가상환경 활성화 및 실행
 .\.venv\Scripts\activate
-
-# 3. 필수 패키지 설치
 pip install -r requirements.txt
-
-# 4. 앱 실행
 python main.py
-# 또는 간편 실행
-run.bat
+
+# 단일 .exe 빌드
+pyinstaller "YDL Studio.spec" --noconfirm
 ```
-
-### 2. 단일 실행 파일(.exe) 빌드
-
-```bash
-pyinstaller "YDL Studio.spec"
-```
-빌드 완료 시 `dist/YDL Studio.exe` 파일 하나로 배포 및 실행 가능합니다.
-
----
-
-## 🛠️ 사용 시나리오
-
-1. **유튜브 / 인스타 / 틱톡 등 일반 영상**:
-   - 주소 복사 후 상단 입력창에 붙여넣고 **[⚡ 영상 추가]** 클릭
-2. **다운로드가 안 되는 일반 웹사이트 / 크롬캐스트 전송 영상**:
-   - 상단의 **[🌐 브라우저 감지기 (만능 스니퍼)]** 클릭
-   - 팝업에서 **[🚀 브라우저 열기]** 클릭 후 해당 웹사이트에서 영상 재생 (또는 크롬캐스트 전송)
-   - 실시간 감지 목록에 뜬 항목의 **[📥 대기열 추가]** 클릭 후 다운로드!
-3. **실시간 라이브 방송**:
-   - 카드가 라이브 방송(`🔴 LIVE`)으로 표시되며 **[🔴 녹화 시작]**을 누르고, 원하는 시점에 **[⏹️ 녹화 종료]**를 누르면 끝!
 
 ---
 

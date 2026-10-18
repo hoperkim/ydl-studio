@@ -1,7 +1,7 @@
 """
-Download Card Component representing a queued or active download.
-Features thumbnail, platform badge, title, channel info, preset selector, progress bar,
-live recording stop control, cancel, and folder open.
+Download Card Component representing a queued or active download (v2.0 Universal).
+Features thumbnail, platform/audio badge, smart preset pre-selection, auto-start support,
+progress bar, live recording stop control, one-click play, and folder open.
 """
 import os
 import subprocess
@@ -15,7 +15,7 @@ from app.ui.theme import COLORS, FONTS
 
 
 class DownloadCard(ctk.CTkFrame):
-    """Modern card widget for an individual video in the download queue."""
+    """Modern card widget for an individual video or audio item in the download queue."""
 
     def __init__(
         self,
@@ -44,6 +44,7 @@ class DownloadCard(ctk.CTkFrame):
         self.task: Optional[DownloadTask] = None
         self.output_filepath: Optional[str] = None
         self.is_downloading = False
+        self.is_finished = False
 
         self._build_ui()
         self._load_thumbnail_async()
@@ -52,9 +53,11 @@ class DownloadCard(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=1)
 
         # 1. Left: Thumbnail container
+        media_intent = self.info.get('media_intent', 'video')
+        placeholder_icon = "🎵 음원\n불러오는 중…" if media_intent == "audio" else "🎬 미리보기\n불러오는 중…"
         self.thumb_label = ctk.CTkLabel(
             self,
-            text="미리보기\n불러오는 중…",
+            text=placeholder_icon,
             width=150,
             height=85,
             corner_radius=8,
@@ -74,6 +77,12 @@ class DownloadCard(ctk.CTkFrame):
         if self.is_live:
             badge_color = "#ef4444"
             badge_text = "🔴 LIVE"
+        elif "음원" in stream_type or "music" in stream_type.lower() or "soundcloud" in stream_type.lower():
+            badge_color = "#f59e0b"
+            badge_text = stream_type
+        elif "보안" in stream_type:
+            badge_color = "#10b981"
+            badge_text = stream_type
         elif "m3u8" in stream_type.lower() or "hls" in stream_type.lower():
             badge_color = "#ec4899"
             badge_text = "HLS (m3u8)"
@@ -99,8 +108,8 @@ class DownloadCard(ctk.CTkFrame):
         )
         self.badge_label.grid(row=0, column=0, padx=(0, 8), sticky="w")
 
-        raw_title = self.info.get('title', '영상 제목')
-        title_text = raw_title if len(raw_title) <= 50 else raw_title[:47] + "..."
+        raw_title = self.info.get('title', '미디어 제목')
+        title_text = raw_title if len(raw_title) <= 54 else raw_title[:51] + "..."
         self.title_label = ctk.CTkLabel(
             header_frame,
             text=title_text,
@@ -146,21 +155,23 @@ class DownloadCard(ctk.CTkFrame):
         ctrl_frame.grid(row=1, column=1, sticky="ew", padx=(0, 12), pady=(0, 6))
         ctrl_frame.grid_columnconfigure(0, weight=1)
 
-        # Preset drop-down
         presets = self.info.get('available_presets', ["최고 화질 (Best Auto)"])
-        self.preset_var = ctk.StringVar(value=presets[0])
+        initial_preset = self.info.get('selected_preset') or presets[0]
+        if initial_preset not in presets:
+            initial_preset = presets[0]
+
+        self.preset_var = ctk.StringVar(value=initial_preset)
         self.opt_preset = ctk.CTkOptionMenu(
             ctrl_frame,
             values=presets,
             variable=self.preset_var,
-            width=200,
+            width=220,
             height=34,
             font=FONTS["body"],
             dropdown_font=FONTS["body"]
         )
         self.opt_preset.grid(row=0, column=0, sticky="w", padx=(0, 8))
 
-        # Action button (Download / Live Record / Cancel / Open Folder)
         btn_action_text = "🔴 녹화 시작" if self.is_live else "⬇️ 다운로드"
         btn_action_color = "#ef4444" if self.is_live else COLORS["accent_primary"]
         btn_action_hover = "#dc2626" if self.is_live else COLORS["accent_hover"]
@@ -176,6 +187,19 @@ class DownloadCard(ctk.CTkFrame):
             command=self._toggle_download
         )
         self.btn_action.grid(row=0, column=1, padx=(0, 6))
+
+        # Play File button (initially hidden)
+        self.btn_play = ctk.CTkButton(
+            ctrl_frame,
+            text="▶️ 바로 재생",
+            width=95,
+            height=34,
+            font=FONTS["body_bold"],
+            fg_color="#10b981",
+            hover_color="#059669",
+            text_color="white",
+            command=self._play_file
+        )
 
         # Open Folder button (initially hidden)
         self.btn_folder = ctk.CTkButton(
@@ -231,15 +255,20 @@ class DownloadCard(ctk.CTkFrame):
             pil_img = fetch_thumbnail_image(thumb_url, size=(150, 85))
             if pil_img:
                 def _update_ui():
-                    ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(150, 85))
-                    self.thumb_label.configure(image=ctk_img, text="")
+                    if self.winfo_exists():
+                        ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(150, 85))
+                        self.thumb_label.configure(image=ctk_img, text="")
                 self.after(0, _update_ui)
 
         threading.Thread(target=_fetch, daemon=True).start()
 
+    def start_download(self):
+        """Public helper to start download if not already running or finished."""
+        if not self.is_downloading and not self.is_finished:
+            self._toggle_download()
+
     def _toggle_download(self):
         if self.is_downloading:
-            # Cancel or Stop Live Recording
             if self.task:
                 self.task.cancel()
             self.is_downloading = False
@@ -259,8 +288,8 @@ class DownloadCard(ctk.CTkFrame):
                 self.status_label.configure(text="다운로드 취소됨", text_color=COLORS["accent_warning"])
             self.opt_preset.configure(state="normal")
         else:
-            # Start
             self.is_downloading = True
+            self.is_finished = False
             self.opt_preset.configure(state="disabled")
             stop_btn_text = "⏹️ 녹화 종료" if self.is_live else "⏹️ 취소"
             self.btn_action.configure(
@@ -270,7 +299,7 @@ class DownloadCard(ctk.CTkFrame):
             )
             self.progress_bar.set(0.0)
             self.status_label.configure(
-                text="녹화 시작…" if self.is_live else "다운로드 시작…",
+                text="녹화 시작…" if self.is_live else "자동 다운로드 시작…",
                 text_color=COLORS["text_muted"]
             )
             self.speed_label.configure(text="")
@@ -280,6 +309,7 @@ class DownloadCard(ctk.CTkFrame):
 
             self.task = DownloadTask(
                 url=self.info['url'],
+                page_url=self.info.get('page_url') or self.info['url'],
                 save_dir=save_dir,
                 preset=self.preset_var.get(),
                 browser_cookie=browser_cookie,
@@ -296,6 +326,8 @@ class DownloadCard(ctk.CTkFrame):
 
     def _on_progress(self, percent: float, speed_str: str, eta_str: str):
         def _update():
+            if not self.winfo_exists():
+                return
             if not self.is_live:
                 self.progress_bar.set(percent / 100.0)
                 meta_parts = [f"{percent:.1f}%"]
@@ -311,8 +343,12 @@ class DownloadCard(ctk.CTkFrame):
 
     def _on_status_change(self, status: str, message: str):
         def _update():
-            if status == "PROCESSING":
+            if not self.winfo_exists():
+                return
+            if status in ("STARTING", "ANALYZING", "PROCESSING"):
                 self.status_label.configure(text=message, text_color=COLORS["accent_primary"])
+            elif status == "DOWNLOADING":
+                self.status_label.configure(text=message, text_color=COLORS["text_primary"] if "text_primary" in COLORS else "white")
             elif status == "LIVE_RECORDING":
                 self.status_label.configure(text=message, text_color="#ef4444")
             elif status == "CANCELLED":
@@ -325,17 +361,26 @@ class DownloadCard(ctk.CTkFrame):
 
     def _on_finish(self, filepath: str):
         def _update():
+            if not self.winfo_exists():
+                return
             self.is_downloading = False
+            self.is_finished = True
             self.output_filepath = filepath
             self.progress_bar.set(1.0)
             self.progress_bar.configure(progress_color=COLORS["accent_success"])
             self.btn_action.grid_forget()
-            self.btn_folder.grid(row=0, column=1, padx=(0, 6))
+            if filepath and os.path.isfile(filepath):
+                self.btn_play.grid(row=0, column=1, padx=(0, 6))
+                self.btn_folder.grid(row=0, column=2, padx=(0, 6))
+            else:
+                self.btn_folder.grid(row=0, column=1, padx=(0, 6))
             self.speed_label.configure(text="")
         self.after(0, _update)
 
     def _on_error(self, error_msg: str):
         def _update():
+            if not self.winfo_exists():
+                return
             self.is_downloading = False
             self.opt_preset.configure(state="normal")
             self.btn_action.configure(
@@ -345,6 +390,13 @@ class DownloadCard(ctk.CTkFrame):
             )
             self.speed_label.configure(text="")
         self.after(0, _update)
+
+    def _play_file(self):
+        if self.output_filepath and os.path.isfile(self.output_filepath):
+            try:
+                os.startfile(os.path.normpath(self.output_filepath))
+            except Exception:
+                self._open_folder()
 
     def _open_folder(self):
         target = self.output_filepath or self.get_download_dir()
