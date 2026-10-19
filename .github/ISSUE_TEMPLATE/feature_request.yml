@@ -1,0 +1,20 @@
+name: Feature Request / 기능 제안
+description: Suggest an improvement or new feature for YDL Studio / 새로운 기능이나 개선 아이디어를 제안합니다.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Use Case / 어떤 불편함이나 필요한 상황이 있나요?
+      placeholder: "예: 다운로드 완료 후 파일명 규칙을 지정하고 싶습니다."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution / 제안하는 동작 방식
+      placeholder: "원하시는 UI나 동작 방식을 자유롭게 적어 주세요."
+    validations:
+      required: true

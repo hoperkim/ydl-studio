@@ -1,0 +1,51 @@
+name: Bug Report / 사이트 다운로드 오류 제보
+description: Report a broken download, UI issue, or crash / 다운로드 실패나 프로그램 오류를 제보합니다.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please provide the details below so we can reproduce the problem.
+        오류를 제보해 주셔서 감사합니다. 원인을 빠르게 파악할 수 있도록 아래 항목을 작성해 주세요.
+
+  - type: dropdown
+    id: install_type
+    attributes:
+      label: Execution Method / 실행 환경
+      options:
+        - "Portable EXE (YDL-Studio-v2.0.0.exe)"
+        - "Python Source (python main.py)"
+    validations:
+      required: true
+
+  - type: input
+    id: target_url
+    attributes:
+      label: Target URL or Domain / 문제가 발생한 주소 또는 사이트명
+      description: Provide a sample URL or domain name (remove personal login tokens). Note that Widevine/PlayReady DRM sites are not supported.
+      placeholder: "https://example.com/watch/..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Selected Mode / 선택한 모드
+      options:
+        - "🤖 스마트 자동 (Smart Auto)"
+        - "🎬 최고화질 영상 (Best Video MP4)"
+        - "🎵 최고음질 음원 (MP3 320k)"
+        - "🎼 무손실 음원 (FLAC)"
+        - "📺 1080p FHD 영상 (MP4)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: error_details
+    attributes:
+      label: What happened? / 어떤 증상이나 오류 메시지가 표시되었나요?
+      description: Copy the status text shown on the card or console log.
+      placeholder: "예: 분석 실패 메시지가 표시됨 / 특정 퍼센트에서 멈춤 등"
+    validations:
+      required: true

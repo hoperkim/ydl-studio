@@ -61,7 +61,7 @@ def clean_media_url(url: str) -> str:
     """
     if not url:
         return ""
-    clean = url.strip().rstrip('),.;"\'>]')
+    clean = url.strip().rstrip('),.;!"\'>]')
     lower = clean.lower()
 
     # TikTok: strip tracking params like is_from_webapp, sender_device
